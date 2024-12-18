@@ -42,21 +42,26 @@ func LoadConfig(configDir string) {
 		if hasValidExtension(file.Name()) {
 			// 打印文件名
 			fmt.Printf("找到配置文件: %s\n", file.Name())
-			V.SetConfigFile(filepath.Join(configDir, file.Name()))
-			err := V.MergeInConfig()
-			if err != nil {
-				fmt.Printf("加载配置文件失败: %s, 错误: %v\n", file.Name(), err)
+			filename := file.Name()
+			baseName := filename[:len(filename)-len(filepath.Ext(filename))] // 去掉扩展名
+			// 创建一个临时 Viper 实例加载当前文件
+			tempViper := viper.New()
+			tempViper.SetConfigName(baseName)
+			tempViper.AddConfigPath(configDir)
+			tempViper.SetConfigType(filepath.Ext(filename)[1:]) // 动态设置配置类型
+			// 读取当前配置文件
+			if err := tempViper.ReadInConfig(); err != nil {
+				fmt.Printf("加载配置文件失败 (%s): %v", filename, err)
 				return
-			} else {
-				fmt.Printf("成功加载配置文件: %s\n", file.Name())
+			}
+			// 使用 MergeInConfig 将文件内容合并到主 Viper 实例
+			if err := V.MergeConfigMap(tempViper.AllSettings()); err != nil {
+				fmt.Printf("合并配置文件失败 (%s): %v", filename, err)
+				return
 			}
 		}
 	}
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf("读取配置文件夹失败: %v\n", err)
-		return
-	}
-	err = viper.Unmarshal(&C)
+	err = V.Unmarshal(&C)
 	if err != nil {
 		fmt.Printf("读取配置文件夹失败: %v\n", err)
 		return
