@@ -1,0 +1,9 @@
+server:
+  port: 8081
+  mode: debug
+log:
+  filename: "app.log"
+  max_size: 10
+  max_back_ups: 7
+  max_age: 28
+  compress: true
