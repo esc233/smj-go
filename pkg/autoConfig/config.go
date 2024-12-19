@@ -1,4 +1,4 @@
-package config
+package autoConfig
 
 import (
 	"fmt"
@@ -7,6 +7,17 @@ import (
 	"path/filepath"
 	"strings"
 )
+
+type appInfo struct {
+	Name    string `mapstructure:"name"`
+	Version string `mapstructure:"version"`
+}
+
+type Config struct {
+	Server  serverConfig `mapstructure:"server"`
+	Log     logConfig    `mapstructure:"log"`
+	AppInfo appInfo      `mapstructure:"app_info"`
+}
 
 var C Config
 var V = viper.New()

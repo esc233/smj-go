@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"smj-go/pkg/config"
+	"smj-go/pkg/autoConfig"
 )
 
 var (
@@ -13,6 +13,7 @@ var (
 
 func main() {
 	flag.Parse()
-	config.LoadConfig(*configDir)
-	fmt.Println(config.C)
+	c := autoConfig.AutoConfig{}
+	autoConfig.StartApp(*configDir, c)
+	fmt.Println(autoConfig.C)
 }
